@@ -1,0 +1,61 @@
+.classifier-params-wrapper {
+    margin-left: 20px;
+}
+
+#create-classifier-wrapper {
+    margin-bottom: 20px;
+}
+
+#classifier-params {
+    margin-bottom: 30px;
+}
+
+#classifier-params input[type="text"] {
+    width: 40px;
+}
+
+.classifier-param {
+    margin: 0 0 5px 0;
+}
+
+.classifier-params-wrapper p {
+    max-width: 400px;
+}
+
+
+/* tooltips */
+
+.tooltip-trigger {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+}
+
+.parameter-tooltip.active ~ .tooltip-trigger,
+.tooltip-trigger:hover {
+    color: #0b2d5f;
+}
+
+.parameter-tooltip {
+    display: none;
+}
+
+.parameter-tooltip.active {
+    display: block;
+    background-color: #ddd;
+    border-radius: 2px;
+    margin: 5px 0;
+    padding: 8px 12px;
+}
+
+/* bugfixes */
+.resource-details {
+    transition: margin-left 0.3s ease;
+    left: 300px !important;
+    z-index: 3 !important;
+}
+
+.resources:hover ~ .resource-details {
+    left: 600px !important;
+}

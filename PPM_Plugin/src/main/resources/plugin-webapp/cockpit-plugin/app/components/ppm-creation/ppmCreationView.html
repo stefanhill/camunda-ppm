@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+    <title>Create Classifier</title>
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/components/ppm-creation/ppmCreationStyle.css">
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/shared/styles/ppmAdminStyle.css">
+</head>
+
+<body>
+<div id="create" class="admin-container">
+        <h3>Create Classifier
+            <div ng-if="!classifiersLoaded" class="load-indicator">
+                <div data-state="waiting" class="state-label">
+                    <span class="glyphicon glyphicon-refresh" data-state-icon="waiting"></span>
+                </div>
+            </div>
+        </h3>
+    <div class="admin-container-content">
+        <div class="available-classifiers-wrapper">
+            <form id="available-classifiers" class="input-scrollable-radio">
+                <div ng-repeat="item in availableClassifierObjects">
+                    <input type="radio" id="available-{{$index}}" value="{{item.name}}" name="available">
+                    <label for="available-{{$index}}" class="list-label">{{item.name}}<span
+                            ng-repeat="predictionTypeItem in availableClassifierObjects[$index].predictionTypes"
+                            class="prediction-type-icon glyphicon {{predictionTypeItem}}"></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="classifier-params-wrapper">
+            <p>If you are not sure which classifier to use, check out the <a onclick="jumpToHyperOpt()">hyper parameter optimization tool</a>.</p>
+            <form id="create-classifier-wrapper">
+                <input type="text" id="given-name" class="name-input" placeholder="Name" onchange="checkParameters()"
+                       oninput="checkParameters()">
+                <label for="given-name" class="hidden-label">Please insert a name for the new classifier.</label>
+                <button id="create-classifier" class="admin-button state-button" data-state="disabled" value="Create">
+                    Create
+                    <span class="glyphicon glyphicon-alert" data-state-icon="disabled"></span>
+                    <span class="glyphicon glyphicon-play" data-state-icon="enabled"></span>
+                    <span class="glyphicon glyphicon-cog" data-state-icon="waiting"></span>
+                    <span class="glyphicon glyphicon-ok" data-state-icon="success"></span>
+                    <span class="glyphicon glyphicon-ban-circle" data-state-icon="fail"></span></button>
+            </form>
+            <form id="classifier-params" onchange="checkParameters()" oninput="checkParameters()">
+                <div class="multi-param classifier-param" ng-repeat="item in currentClassifierParams.multi">
+                    <label for="parameter-{{item.parameter_id}}">{{item.text}}</label>
+                    <span class="tooltip-trigger glyphicon glyphicon-info-sign" onclick="toggleTooltip($(this))"></span>
+                    <div class="checkboxParam"
+                         ng-repeat="multiItem in currentClassifierParams.multi[$index].possible_value">
+                        <input type="checkbox" value="{{multiItem}}"
+                               id="multi-parameter-{{item.parameter_id}}-{{$index}}"
+                               data-parameter="{{item.parameter_id}}">
+                        <label for="multi-parameter-{{item.parameter_id}}-{{$index}}">{{multiItem}}
+                            <span class="glyphicon {{getPredictionIconClass(multiItem)}}"></span>
+                        </label>
+                    </div>
+                    <div class="parameter-tooltip">{{item.info_text}}</div>
+                </div>
+                <div class="option-param classifier-param" ng-repeat="item in currentClassifierParams.option">
+                    <label for="parameter-{{item.parameter_id}}">{{item.text}}</label>
+                    <span class="tooltip-trigger glyphicon glyphicon-info-sign" onclick="toggleTooltip($(this))"></span>
+                    <div class="optionParam"
+                         ng-repeat="optionItem in currentClassifierParams.option[$index].possible_value">
+                        <input type="radio" value="{{optionItem}}"
+                               id="option-parameter-{{item.parameter_id}}-{{$index}}"
+                               data-parameter="{{item.parameter_id}}" name="option-name-{{item.parameter_id}}">
+                        <label for="option-parameter-{{item.parameter_id}}-{{$index}}">{{optionItem}}</label>
+                    </div>
+                    <div class="parameter-tooltip">{{item.info_text}}</div>
+                </div>
+                <div class="single-param classifier-param" ng-repeat="item in currentClassifierParams.single">
+                    <label for="parameter-{{item.parameter_id}}">{{item.text}}</label>
+                    <span class="tooltip-trigger glyphicon glyphicon-info-sign" onclick="toggleTooltip($(this))"></span>
+                    <input type="text" value="{{item.suggested_value}}" id="parameter-{{item.parameter_id}}"
+                           data-parameter="{{item.parameter_id}}">
+                    <div class="parameter-tooltip">{{item.info_text}}</div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<html lang="en">
+<head>
+    <title>Train Classifier</title>
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/components/ppm-training/ppmTrainingStyle.css">
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/shared/styles/ppmAdminStyle.css">
+</head>
+<body class="nbody">
+<div id="training" class="admin-container">
+    <h3>Train & Edit Classifier</h3>
+    <div class="admin-container-content">
+        <form id="trainable-classifiers" class="input-scrollable-radio">
+            <div ng-repeat="item in trainableClassifiers" class="list-label-wrapper">
+                <input ng-model="currentClassifierName" type="radio" id="trainable-{{$index}}" name="trainable"
+                       value="{{item.name}}" onchange="onChangeCurrentClassifier($(this))">
+                <label for="trainable-{{$index}}" class="list-label state-label"
+                       data-classifier-name="{{item.name}}" onclick="toggleClassifierElem($(this))"
+                       data-state="{{configs[item.name]['trainingState']}}">{{item.name}}
+                    [v.{{item.version}}]
+                    <span class="prediction-type-icon glyphicon glyphicon-cog" data-state-icon="waiting"></span>
+                </label>
+            </div>
+        </form>
+
+        <div class="panel-wrapper" ng-if="currentClassifierName">
+            <div class="button-panel">
+                <button class="admin-button" name="action"
+                        ng-disabled="!currentConfig || currentConfig.isTrainingRunning"
+                        onclick="onClickRenameClassifier()"> Rename
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+
+                <button class="copy-classifier-button admin-button" name="action"
+                        ng-disabled="!currentConfig || currentConfig.isTrainingRunning
+                            || currentClassifierMeta.version === 0" onclick="onClickCopyClassifier()"> Copy
+                    <span class="glyphicon glyphicon-copy"></span>
+                </button>
+
+                <div class="revert-classifier-button-wrapper form-button-group">
+                    <label for="revert-versions">Revert to version:</label>
+                    <select id="revert-versions" name="versions">
+                        <option ng-repeat="item in currentClassifierVersionRange" value="{{item}}">{{item}}</option>
+                    </select>
+                    <button class="revert-classifier-button admin-button" name="action"
+                            ng-disabled="!currentConfig || currentConfig.isTrainingRunning
+                            || currentClassifierMeta.version < 2" onclick="onClickRevertClassifier()"> Revert
+                        <span class="glyphicon glyphicon-backward"></span>
+                    </button>
+                </div>
+                <button class="delete-classifier-button admin-button" name="action"
+                        ng-disabled="!currentConfig || currentConfig.isTrainingRunning"
+                        onclick="onClickDeleteClassifier()"> Delete
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+
+            <div class="training-panel">
+
+                <h4>Training</h4>
+
+                <div class="training-form-row">
+                    <label>Training mode:</label>
+                    <button id="history-data-button" name="action" ng-class="getTrainingDataButtonClasses('history')"
+                            ng-disabled="!currentConfig || currentConfig.disableDataSelection"
+                            onclick="onClickHistoryData()">
+                        History Data
+                        <span class="glyphicon glyphicon-time"></span>
+                    </button>
+                    <input type="button" id="xes-file-proxy"
+                           ng-disabled="!currentConfig || currentConfig.disableDataSelection" value="Upload XES"
+                           onclick="document.getElementById('xes-file').click();"
+                           ng-class="getTrainingDataButtonClasses('xes')">
+                    <input type="file" id="xes-file"
+                           ng-disabled="!currentConfig || currentConfig.disableDataSelection"
+                           class="hidden-label"
+                           name="file" onchange="onSelectXES()"/>
+                    <div ng-if="currentConfig && currentConfig.xesFile" id="xes-file-info">
+                        <span class="glyphicon glyphicon-file"></span>
+                        {{currentConfig.xesFile.name}}
+                    </div>
+                </div>
+
+                <div class="training-form-row history-data-form">
+                    <label for="history-data-with-timeframe">History Time Frame: </label>
+                    <input type="checkbox" id="history-data-with-timeframe"
+                           onclick="onClickSpecifyTimeFrame()"
+                           ng-disabled="!currentConfig || currentConfig.disableDataSelection"
+                           ng-model="currentConfig.trainWithHistoryDataAndTimeFrame"
+                           name="history-data-with-timeframe">
+                    <form>
+                        <span class="glyphicon glyphicon-calendar"></span>&nbsp;
+                        <div class="time-frame-label"> From</div>
+                        <input class="time-frame-input" date-range-picker
+                               ng-if="currentConfig" id="history-data-from" type="text"
+                               ng-model="currentConfig.historyDataFrom"
+                               options="currentConfig.timeFrameOptions"/>
+                    </form>
+                    <form>
+                        <span class="glyphicon glyphicon-calendar"></span>&nbsp;
+                        <div class="time-frame-label"> Until</div>
+                        <input class="time-frame-input" date-range-picker
+                               ng-if="currentConfig" id="history-data-until" type="text"
+                               ng-model="currentConfig.historyDataUntil"
+                               options="currentConfig.timeFrameOptions"/>
+                    </form>
+                </div>
+
+                <div class="training-form-row">
+                    <label for="train-test-ratio">Train/Test-Ratio: </label>
+                    <span id="train-ratio"></span>
+                    <input type="range" id="train-test-ratio" class="name-input" min="0" max="100" step="1" ng-if="currentConfig"
+                            ng-model="currentConfig.trainingRatio" onchange="updateTrainTestRatio()" oninput="updateTrainTestRatio()"
+                            ng-disabled="!(currentConfig.trainingState==='enabled')">
+                    <span id="test-ratio"></span>
+                </div>
+
+                <div class="training-form-row">
+                    <button ng-if="currentConfig" id="training-button"
+                            ng-disabled="!currentConfig.trainingDataSpecified"
+                            class="admin-button state-button" data-state="{{currentConfig.trainingState}}"
+                            onclick="onClickTraining()">
+                        <!--<span ng-class="getTrainingButtonClasses()"></span>-->
+                        <span data-state-icon="enabled">Start</span>
+                        <span data-state-icon="waiting">Cancel</span>
+                        <span data-state-icon="finished">Reset Forms</span>
+                        <span class="glyphicon glyphicon-play" data-state-icon="enabled"></span>
+                        <span class="glyphicon glyphicon-cog" data-state-icon="waiting"></span>
+                        <span class="glyphicon glyphicon-share-alt reset-icon" data-state-icon="finished"></span>
+                    </button>
+                    <span ng-if="currentConfig" id="training-duration">{{currentConfig.trainingDuration}}</span>
+                    <span ng-if="currentConfig" id="accuracy">Accuracy: {{currentConfig.acurracy}}</span>
+                </div>
+            </div>
+
+            <div class="parameter-panel">
+                <div class="info-collapse-wrapper">
+                    <label class="info-collapse-label"><span class="glyphicon glyphicon-chevron-right"></span>Meta
+                        Information</label>
+                    <div class="info-collapse-list">
+                        <ul>
+                            <li>Author: {{currentClassifierMeta.author}}</li>
+                            <li>Version: {{currentClassifierMeta.version}}</li>
+                            <li>Created: {{getCurrentClassifierCreationTimeString()}}</li>
+                            <li>Modified: {{getCurrentClassifierLastModifiedString()}}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="info-collapse-wrapper">
+                    <label class="info-collapse-label"><span class="glyphicon glyphicon-chevron-right"></span>Parameter</label>
+                    <div class="info-collapse-list">
+                        <ul>
+                            <li ng-repeat="parameter in currentClassifierParams">{{parameter.text}}:
+                                {{parameter.current_value}}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="error-panel" ng-if="!currentClassifierName">
+            <p>Please select a classifier from the list on the left.</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade sub-modal" id="confirmRevertModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Confirm revert</h4>
+            </div>
+            <div class="modal-body">
+                <p>Do you really want to revert? This will delete all versions from the reverting point on. Please make
+                    a copy of the classifier to preserve all versions.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="confirmRevert()">Revert
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade sub-modal" id="confirmDeleteModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Confirm delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>Do you really want to delete this classifier and all versions of this classifier?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="confirmDelete()">Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade sub-modal" id="renameModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Rename classifier</h4>
+            </div>
+            <div class="modal-body">
+                <label for="copy-given-name">Please enter a new name for classifier:
+                    {{currentClassifierName}}</label><br>
+                <input type="text" id="rename-input" class="name-input" onfocus="this.select();" value="{{currentClassifierName}}">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="confirmRename()">Rename
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade sub-modal" id="confirmCopyModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Copy classifier</h4>
+            </div>
+            <div class="modal-body">
+                <label for="copy-given-name">Please enter a name for the copy of your classifier:</label><br>
+                <input type="text" id="copy-given-name" class="name-input" onfocus="this.select();" value="{{currentClassifierName}} (Copy)">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="confirmCopy()">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

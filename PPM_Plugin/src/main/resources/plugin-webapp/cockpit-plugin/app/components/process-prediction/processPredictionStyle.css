@@ -1,0 +1,88 @@
+#process-prediction {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+#process-prediction .list-label {
+    border-left: 3px rgb(250, 250, 250) solid;
+}
+
+.prediction-exception {
+    margin-bottom: 30px;
+}
+
+.tooltip-trigger {
+    font-size: 12px;
+}
+
+.next-activity-wrapper {
+    margin-left: 40px;
+    width: 100%;
+}
+
+.next-activity-wrapper ol {
+    padding-left: 0;
+}
+
+.time-risk-wrapper {
+    margin: 0 20px;
+}
+
+.time-risk-wrapper > * {
+    width: 200px;
+}
+
+#time-prediction {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+.risk-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.chart-wrapper,
+.risk-chart {
+    width: 40px;
+    height: 40px;
+}
+
+.risk-circle,
+.background-circle {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: square;
+}
+
+.background-circle {
+    stroke: #ddd;
+}
+#risk-prediction {
+    font-size: 28px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+
+
+/* overlay */
+.bpmn-overlay > .ng-scope {
+    position: relative;
+}
+
+h2.prediction-bubble {
+    margin: 0;
+    color: #000;
+    background-color: #a658ff;
+    right: 0;
+    font-size: 12px;
+    position: absolute;
+    padding: 4px;
+    border-radius: 10px;
+    line-height: 1;
+    border: 1px #000 solid;
+}

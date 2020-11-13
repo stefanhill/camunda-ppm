@@ -1,0 +1,57 @@
+#runtime .admin-container-content {
+    display: flex;
+    flex-direction: row;
+    align-content: space-between;
+}
+
+.merge-classifier-wrapper {
+    padding-left: 15px;
+    margin-top: 20px;
+}
+
+.merge-wrapper > p {
+    margin: 10px 15px;
+    max-width: 250px;
+}
+
+.management-wrapper {
+    margin-left: 20px;
+}
+
+.management-wrapper h4 {
+    margin: 0 0 5px 0;
+}
+
+.action-type-icon,
+input[type="checkbox"] + label,
+input[type="radio"] + label {
+    transition: all 0.3s ease;
+    display: inline-block;
+    padding: 5px;
+    margin-left: 5px;
+    border-radius: 2px;
+}
+
+.action-type-icon:hover,
+input[type="checkbox"] + label:hover,
+input[type="radio"] + label:hover {
+    background-color: #0b2d5f;
+    color: #fff;
+}
+
+input[type="checkbox"]:checked + label,
+input[type="radio"]:checked + label {
+    background-color: #b5152b;
+    color: #fff;
+}
+
+/* bugfixes */
+.resource-details {
+    transition: margin-left 0.3s ease;
+    left: 300px !important;
+    z-index: 3 !important;
+}
+
+.resources:hover ~ .resource-details {
+    left: 600px !important;
+}

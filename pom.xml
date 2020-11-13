@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         
+    <modelVersion>4.0.0</modelVersion>
+        <groupId>uni_ko.bpm.cockpit</groupId>
+        <artifactId>camunda-ppm</artifactId>
+        <version>1.0</version>
+        <packaging>pom</packaging>
+    <name>camunda-ppm</name>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--Define the used Java Version to avoid incompatibilities-->
+        <java.version>1.8</java.version>
+        <junit.version>4.12</junit.version>
+   		<maven.compiler.source>1.8</maven.compiler.source>
+    	<maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+    
+    <modules>
+        <module>./PPM_Plugin</module>
+        <module>./Camunda_Starter</module>
+    </modules>
+  
+</project>
+    
+    

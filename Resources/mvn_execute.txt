@@ -1,0 +1,3 @@
+mvn compile exec:java -Dexec.mainClass="uni_ko.bpm.Tests.RuntimeAnalysis" -Dexec.classpathScope=test > 10_20201018_log.log &
+
+mvn spring-boot:run > server.log &

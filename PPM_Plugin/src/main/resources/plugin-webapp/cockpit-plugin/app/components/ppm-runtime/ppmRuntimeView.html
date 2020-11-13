@@ -1,0 +1,96 @@
+<html lang="en">
+<head>
+    <title>Merge & Manage Classifier</title>
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/components/ppm-runtime/ppmRuntimeStyle.css">
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/shared/styles/ppmAdminStyle.css">
+
+</head>
+<body>
+<div id="runtime" class="admin-container">
+    <h3>Merge & Manage Classifier</h3>
+    <div class="admin-container-content">
+        <div class="merge-wrapper">
+            <p>To create a merged classifier, please select two or more classifier from the list below and enter a
+                name.</p>
+            <form id="trained-classifiers" class="input-scrollable-radio" onchange="checkRuntimeParameters()">
+                <div ng-repeat="item in trainedClassifiers">
+                    <input type="checkbox" id="trained-{{$index}}" value="{{item.name}}" name="trained">
+                    <label for="trained-{{$index}}" class="list-label">{{item.name}}<span
+                            ng-repeat="predictionTypeItem in trainedClassifiers[$index].predictionTypes"
+                            class="prediction-type-icon glyphicon {{predictionTypeItem}}"></span>
+                    </label>
+                </div>
+            </form>
+
+            <div class="merge-classifier-wrapper">
+                <form>
+                    <input type="text" id="merged-given-name" class="name-input" placeholder="Name"
+                           onchange="checkRuntimeParameters()" oninput="checkRuntimeParameters()">
+                    <label for="merged-given-name" class="hidden-label">Please insert a name for the new merged
+                        classifier.</label>
+                    <button id="merge-classifier" class="admin-button state-button" data-state="disabled" value="Merge">
+                        Merge
+                        <span class="glyphicon glyphicon-alert" data-state-icon="disabled"></span>
+                        <span class="glyphicon glyphicon-random" data-state-icon="enabled"></span>
+                        <span class="glyphicon glyphicon-cog" data-state-icon="waiting"></span>
+                        <span class="glyphicon glyphicon-ok" data-state-icon="success"></span>
+                    </button>
+                </form>
+
+            </div>
+        </div>
+        <div class="management-wrapper">
+            <form id="manage-classifiers" class="scrollable-list">
+                <h4>Trained Classifier</h4>
+                <div ng-repeat="item in atomicClassifiers">
+                    <div class="list-label">{{item.name}}
+                        <input type="radio" ng-checked="item.def" id="atomic-def-{{$index}}" data-def="{{item.name}}"
+                               name="defaultClassifier" onchange="setDefaultClassifier($(this))">
+                        <label for="atomic-def-{{$index}}" class="action-type-icon glyphicon glyphicon-star"></label>
+                        <input type="checkbox" id="atomic-publicly-{{$index}}"
+                               data-publicly="{{item.name}}" ng-checked="item.publicly"
+                               onchange="togglePubliclyClassifier($(this))">
+                        <label for="atomic-publicly-{{$index}}"
+                               class="action-type-icon glyphicon glyphicon-eye-open"></label>
+                    </div>
+                </div>
+                <div ng-repeat="item in mergedClassifiers">
+                    <div class="list-label">{{item.name}} <span class="glyphicon glyphicon-random"></span>
+                        <input type="radio" ng-checked="item.def" id="merged-def-{{$index}}" data-def="{{item.name}}"
+                               name="defaultClassifier" onchange="setDefaultClassifier($(this))">
+                        <label for="merged-def-{{$index}}" class="action-type-icon glyphicon glyphicon-star"></label>
+                        <input type="checkbox" ng-checked="item.publicly" id="merged-publicly-{{$index}}"
+                               data-publicly="{{item.name}}" onchange="togglePubliclyClassifier($(this))">
+                        <label for="merged-publicly-{{$index}}"
+                               class="action-type-icon glyphicon glyphicon-eye-open"></label>
+                        <span class="action-type-icon glyphicon glyphicon-trash" id="merged-delete-{{$index}}"
+                              data-delete="{{item.name}}" onclick="deleteMergedClassifier($(this))"></span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade sub-modal" id="confirmDeleteMergedModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Confirm delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>Do you really want to delete this merged classifier and all versions of this classifier? This
+                    operation cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="confirmDeleteMerged()">Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

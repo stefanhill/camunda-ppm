@@ -1,0 +1,254 @@
+#find .admin-container-content {
+    display: flex;
+    flex-direction: column;
+}
+
+
+#add-test-wrapper {
+    display: none;
+    padding: 15px 20px;
+    margin: 15px 0;
+    border-radius: 2px;
+    background-color: #fafafa;
+    max-width: 800px;
+}
+
+.dataset-row,
+.global-settings-row,
+.test-name-wrapper {
+    display: flex;
+    flex-direction: row;
+    margin: 0 0 20px 0;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.dataset-row > label,
+.global-settings-row > label {
+    margin-bottom: 0;
+    margin-right: 15px;
+}
+
+#opt-train-test-ratio {
+    width: 300px;
+}
+
+.classifier-wrapper {
+    margin-bottom: 20px;
+}
+
+.classifier-wrapper > div {
+    margin-bottom: 5px;
+}
+
+.single-param input,
+#save-number {
+    width: 45px;
+}
+
+#test-name {
+    margin-left: 20px;
+}
+
+.history-data-form input {
+    margin-right: 20px;
+}
+
+.opt-classifier-params-wrapper {
+    display: none;
+    background-color: #ffffff;
+    padding: 10px 15px 15px 15px;
+}
+
+.classifier-param {
+    margin-bottom: 5px;
+}
+
+.possible-metrics input,
+.possible-optimizer input,
+.training-mode-wrapper input,
+.classifier-header input {
+    display: none;
+}
+
+.possible-metrics label,
+.possible-optimizer label,
+.training-mode-wrapper label.admin-button,
+.classifier-header label {
+    font-weight: normal;
+    border-radius: 2px;
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+.classifier-header label {
+    width: 100%;
+}
+
+.possible-metrics label:active,
+.possible-optimizer label:active,
+.training-mode-wrapper label.admin-button:active,
+.classifier-header label:active {
+    transform: scale(0.95);
+}
+
+.possible-metrics input:checked + label,
+.possible-optimizer input:checked + label,
+.training-mode-wrapper input:checked + label.admin-button,
+.classifier-header input:checked + label {
+    background-color: #b5152b;
+    color: #ffffff;
+}
+
+.classifier-header input + label span {
+    color: #ffffff;
+    display: none;
+}
+
+.classifier-header input:checked + label span {
+    display: inline;
+}
+
+.possible-metrics label,
+.possible-optimizer label {
+    margin-right: 15px;
+}
+
+#add-test {
+    margin-left: 0;
+}
+
+.test-list-wrapper {
+    max-width: 800px;
+    padding: 15px 20px;
+}
+
+.test-list-elem {
+    margin-bottom: 15px;
+}
+
+.result-header,
+.test-header {
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.result-header span {
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.test-header h4 {
+    margin: 0 15px 0 0;
+}
+
+.result-header:hover,
+.test-header:hover {
+    background-color: #0b2d5f;
+    color: #ffffff;
+}
+
+.result-header:active,
+.test-header:active {
+    transform: scale(0.95);
+}
+
+.result-header.active,
+.result-header.active:hover,
+.test-header.active,
+.test-header.active:hover {
+    background-color: #b5152b;
+    color: #ffffff;
+}
+
+.test-header .test-action {
+    transition: all 0.3s ease;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    margin-left: auto;
+}
+
+.test-header .glyphicon[data-state-icon="waiting"] {
+    opacity: 1;
+}
+
+.test-action:hover {
+    background-color: #ffffff;
+    color: #0b2d5f;
+}
+
+.test-information-wrapper {
+    display: none;
+    padding: 10px 20px;
+    background-color: #fafafa;
+}
+
+.result-body {
+    display: none;
+    padding: 5px 20px;
+    background-color: #ffffff;
+}
+
+.classifier-result-actions {
+    margin: 15px 0;
+}
+
+.test-classifier-result {
+    margin-bottom: 10px;
+}
+
+.test-classifier-ranges-wrapper {
+    margin-top: 20px;
+}
+.info-collapse-list {
+    display: none;
+    margin-left: 20px;
+}
+
+/* tooltips */
+
+.tooltip-trigger {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+}
+
+.parameter-tooltip.active ~ .tooltip-trigger,
+.tooltip-trigger:hover {
+    color: #0b2d5f;
+}
+
+.parameter-tooltip {
+    display: none;
+}
+
+.parameter-tooltip.active {
+    display: block;
+    background-color: #ddd;
+    border-radius: 2px;
+    margin: 5px 0;
+    padding: 8px 12px;
+}
+
+.rotating-icon {
+    animation: rotating 2s linear 0s infinite normal;
+}
+
+
+/* bugfixes */
+.resource-details {
+    transition: margin-left 0.3s ease;
+    left: 300px !important;
+    z-index: 3 !important;
+}
+
+.resources:hover ~ .resource-details {
+    left: 600px !important;
+}

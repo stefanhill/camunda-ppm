@@ -1,0 +1,128 @@
+@keyframes classifier-elem-open {
+    from {
+        max-width: 300px;
+    }
+    to {
+        max-width: 900px;
+    }
+}
+
+@keyframes classifier-elem-box-open {
+    from {
+        transform: translate(-600px, 0);
+        opacity: 0;
+    }
+    to {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+#trainable-classifiers {
+    min-width: 250px;
+}
+
+.panel-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-left: 20px;
+    margin-left: 3px;
+    border-left: #b5152b 3px solid;
+}
+
+.button-panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.button-panel .admin-button:first-child {
+    margin-left: 0;
+}
+
+.form-button-group {
+    margin-left: 20px;
+    padding-left: 15px;
+    background-color: #ddd;
+    border-radius: 2px;
+}
+
+.form-button-group button {
+    margin-left: 0;
+}
+
+.training-form-row {
+    display: flex;
+    flex-direction: row;
+    margin: 0 0 20px 0;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.training-form-row label {
+    margin-bottom: 0;
+}
+
+.training-panel h4 {
+    font-size: 20px;
+}
+
+.time-frame-input {
+    margin-right: 20px;
+}
+
+#train-test-ratio {
+    max-width: 250px;
+}
+
+#train-ratio,
+#test-ratio {
+    width: 20px;
+    margin: 0 10px;
+}
+
+.parameter-panel {
+    width: 100%;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: row;
+    align-content: flex-start;
+}
+
+.parameter-panel .info-collapse-wrapper {
+    min-width: 300px;
+}
+
+#training-button {
+    margin-left: 0;
+    min-width: 120px;
+}
+
+#training-duration,
+#xes-file-info,
+#accuracy,
+.error-panel {
+    margin-left: 20px;
+}
+
+#training-duration {
+    width: 100px;
+}
+
+/* bugfixes */
+#history-data-with-timeframe {
+    margin: 0 10px;
+}
+
+.resource-details {
+    transition: margin-left 0.3s ease;
+    left: 300px !important;
+    z-index: 3 !important;
+}
+
+.resources:hover ~ .resource-details {
+    left: 600px !important;
+}

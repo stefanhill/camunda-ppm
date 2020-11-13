@@ -1,0 +1,306 @@
+<html lang="en">
+<head>
+    <title>Find Classifier</title>
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/components/hyper-opt/hyperOptStyle.css">
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/shared/styles/ppmAdminStyle.css">
+</head>
+
+<body>
+<div id="find" class="admin-container">
+    <h3>Find Classifier</h3>
+    <div class="admin-container-content">
+
+        <div class="button-panel">
+            <button class="admin-button" onclick="reloadTests()"> Reload
+                <span ng-show="testCounter == testList.length" class="glyphicon glyphicon-refresh"></span>
+                <span ng-show="testCounter != testList.length" class="glyphicon glyphicon-refresh rotating-icon"></span>
+            </button>
+
+            <button class="copy-classifier-button admin-button" onclick="toggleAddTest()"> Add Test
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+        </div>
+
+        <div id="add-test-wrapper">
+            <div class="test-name-wrapper">
+                <label for="test-name">Name for the test run: </label>
+                <input type="text" id="test-name" class="name-input" placeholder="Name" oninput="checkOptParameters()"
+                       onchange="checkOptParameters()">
+            </div>
+
+            <div class="dataset-wrapper">
+
+                <div class="dataset-row training-mode-wrapper">
+                    <label for="test-name">Training mode:</label>
+                    <input type="radio" id="opt-history-data" value="history" name="training-mode"
+                           onchange="checkOptParameters()">
+                    <label class="admin-button" for="opt-history-data">History <span
+                            class="glyphicon glyphicon-time"></span></label>
+                    <input id="opt-xes-file-proxy" type="radio"
+                           onclick="document.getElementById('opt-xes-file').click()" value="xes" name="training-mode">
+                    <label class="admin-button" for="opt-xes-file-proxy">XES <span
+                            class="glyphicon glyphicon-cloud-upload"></span></label>
+                    <input type="file" id="opt-xes-file" class="hidden-label" name="file"
+                           onchange="uploadXES();checkOptParameters()"/>
+                    <div ng-if="config.xesFile" id="opt-xes-file-info">
+                        <span class="glyphicon glyphicon-file"></span>
+                        {{config.xesFile.name}}
+                    </div>
+                </div>
+
+                <div class="dataset-row history-data-form">
+                    <label for="history-data-with-timeframe">History Time Frame: </label>
+                    <input type="checkbox" id="history-data-with-timeframe"
+                           onclick="selectTimeFrame()"
+                           name="history-data-with-timeframe">
+                    <form>
+                        <span class="glyphicon glyphicon-calendar"></span>&nbsp;
+                        <div class="time-frame-label"> From:</div>
+                        <input class="time-frame-input" date-range-picker
+                               id="history-data-from" type="text"
+                               ng-model="config.historyDataFrom"
+                               options="config.timeFrameOptions"/>
+                    </form>
+                    <form>
+                        <span class="glyphicon glyphicon-calendar"></span>&nbsp;
+                        <div class="time-frame-label"> Until:</div>
+                        <input class="time-frame-input" date-range-picker
+                               id="history-data-until" type="text"
+                               ng-model="config.historyDataUntil"
+                               options="config.timeFrameOptions"/>
+                    </form>
+                </div>
+
+                <div class="dataset-row">
+                    <label for="opt-train-test-ratio">Train/Test-Ratio: </label>
+                    <span id="opt-train-ratio"></span>
+                    <input type="range" id="opt-train-test-ratio" class="name-input" min="0" max="100" step="1"
+                           value="80" onchange="updateTrainTestRatio()" oninput="updateTrainTestRatio()">
+                    <span id="opt-test-ratio"></span>
+                </div>
+
+            </div>
+
+
+            <div class="classifier-wrapper">
+                <p>Please select one ore more classifier fron the list below and specify their parameter ranges.</p>
+                <div ng-repeat="classifier in possibleClassifier">
+
+                    <div class="classifier-header">
+                        <input type="checkbox" id="possible-{{classifier.name}}"
+                               value="{{classifier.name}}" name="possible-classifier"
+                               onchange="toggleClassifierParams($(this))">
+                        <label class="admin-button" for="possible-{{classifier.name}}">
+                            <span class="glyphicon glyphicon-ok"></span> {{classifier.name}}</label>
+                    </div>
+
+                    <form class="opt-classifier-params-wrapper" data-classifier="{{classifier.name}}"
+                          onchange="checkOptParameters()" oninput="checkOptParameters()">
+
+                        <div class="multi-param classifier-param"
+                             ng-repeat="item in possibleClassifier[$index].parameter.multi"
+                             data-parameter-id="{{item.parameter_id}}">
+                            <label for="opt-parameter-{{item.parameter_id}}">{{item.text}}</label>
+                            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                                  onclick="toggleTooltip($(this))"></span>
+                            <div class="checkboxParam"
+                                 ng-repeat="multiItem in getInnerParameter(item.parameter_id, classifier.name)">
+                                <input type="checkbox" value="{{multiItem}}"
+                                       id="multi-parameter-{{item.parameter_id + '-' + classifier.name + '-' + multiItem}}">
+                                <label for="multi-parameter-{{item.parameter_id + '-' + classifier.name + '-' + multiItem}}">{{multiItem}}
+                                    <span class="glyphicon {{getPredictionIconClass(multiItem)}}"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-tooltip">{{item.info_text}}</div>
+                        </div>
+
+                        <div class="single-param classifier-param"
+                             ng-repeat="item in possibleClassifier[$index].parameter.single"
+                             data-parameter-id="{{item.parameter-id}}">
+                            <label>{{item.text}}</label>
+                            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                                  onclick="toggleTooltip($(this))"></span>
+                            <span>from: </span>
+                            <input type="text" value="{{item.from}}" data-parameter="{{item.parameter_id}}"
+                                   class="from-param">
+                            <span>to: </span>
+                            <input type="text" value="{{item.to}}" data-parameter="{{item.parameter_id}}"
+                                   class="to-param">
+                            <span>stepsize: </span>
+                            <input type="text" value="{{item.stepping}}" data-parameter="{{item.parameter_id}}"
+                                   class="stepping-param">
+                            <div class="parameter-tooltip">{{item.info_text}}</div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <div class="global-setting-wrapper">
+
+                <div class="global-settings-row">
+                    <label>Evaluation metrics: </label>
+                    <div class="possible-metrics" ng-repeat="metric in possibleMetrics">
+                        <input type="radio" value="{{metric}}" id="metric-{{metric}}" name="possible-metric"
+                               onchange="checkOptParameters()">
+                        <label for="metric-{{metric}}" class="admin-button">{{metric}}</label>
+                    </div>
+                </div>
+
+                <div class="global-settings-row">
+                    <label for="save-number">Number of best classifier: </label>
+                    <input type="text" id="save-number" class="name-input" value="3" oninput="checkOptParameters()"
+                           onchange="checkOptParameters()">
+                </div>
+
+                <div class="global-settings-row">
+                    <label>Optimizer: </label>
+                    <div class="possible-optimizer" ng-repeat="optimizer in possibleOptimizer">
+                        <input type="radio" value="{{optimizer.name}}" id="optimizer-{{optimizer.name}}"
+                               name="optimizer" onchange="showOptimizerParameter($(this));checkOptParameters()">
+                        <label for="optimizer-{{optimizer.name}}" class="admin-button">{{optimizer.name}}</label>
+                    </div>
+                </div>
+
+                <div class="global-settings-row" ng-show="currentOptimizerParameter.show">
+                    <form id="optimizer-params" onchange="checkOptParameters()" oninput="checkOptParameters()">
+                        <div class="multi-param optimizer-param" ng-repeat="item in currentOptimizerParameter.multi">
+                            <label for="opt-parameter-{{item.parameter_id}}">{{item.text}}</label>
+                            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                                  onclick="toggleTooltip($(this))"></span>
+                            <div class="checkboxParam"
+                                 ng-repeat="multiItem in currentOptimizerParameter.multi[$index].possible_value">
+                                <input type="checkbox" value="{{multiItem}}"
+                                       id="opt-multi-parameter-{{item.parameter_id}}-{{$index}}"
+                                       data-parameter="{{item.parameter_id}}">
+                                <label for="opt-multi-parameter-{{item.parameter_id}}-{{$index}}">{{multiItem}}
+                                    <span class="glyphicon {{getPredictionIconClass(multiItem)}}"></span>
+                                </label>
+                            </div>
+                            <div class="parameter-tooltip">{{item.info_text}}</div>
+                        </div>
+                        <div class="option-param optimizer-param" ng-repeat="item in currentOptimizerParameter.option">
+                            <label for="opt-parameter-{{item.parameter_id}}">{{item.text}}</label>
+                            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                                  onclick="toggleTooltip($(this))"></span>
+                            <div class="optionParam"
+                                 ng-repeat="optionItem in currentOptimizerParameter.option[$index].possible_value">
+                                <input type="radio" value="{{optionItem}}"
+                                       id="opt-option-parameter-{{item.parameter_id}}-{{$index}}"
+                                       data-parameter="{{item.parameter_id}}" name="option-name-{{item.parameter_id}}">
+                                <label for="opt-option-parameter-{{item.parameter_id}}-{{$index}}">{{optionItem}}</label>
+                            </div>
+                            <div class="parameter-tooltip">{{item.info_text}}</div>
+                        </div>
+                        <div class="single-param optimizer-param" ng-repeat="item in currentOptimizerParameter.single">
+                            <label for="opt-parameter-{{item.parameter_id}}">{{item.text}}</label>
+                            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                                  onclick="toggleTooltip($(this))"></span>
+                            <input type="text" value="{{item.suggested_value}}" id="opt-parameter-{{item.parameter_id}}"
+                                   data-parameter="{{item.parameter_id}}">
+                            <div class="parameter-tooltip">{{item.info_text}}</div>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="global-settings-row">
+                    <button id="add-test" class="admin-button state-button" data-state="disabled" value="Start Test"
+                            onclick="createTest()">
+                        Start Test
+                        <span class="glyphicon glyphicon-alert" data-state-icon="disabled"></span>
+                        <span class="glyphicon glyphicon-play" data-state-icon="enabled"></span>
+                        <span class="glyphicon glyphicon-cog" data-state-icon="waiting"></span>
+                        <span class="glyphicon glyphicon-ok" data-state-icon="success"></span>
+                        <span class="glyphicon glyphicon-ban-circle" data-state-icon="fail"></span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="test-list-wrapper">
+            <div ng-repeat="test in testList" data-state="{{test.state}}" class="test-list-elem">
+
+                <div class="test-header" onclick="toggleTestInformation($(this))">
+                    <h4>{{test.name}}</h4>
+                    <span ng-show="test.state == 'waiting' || test.state == 'running'"
+                          class="glyphicon glyphicon-cog rotating-icon" data-state-icon="waiting"></span>
+                    <!--<span class="glyphicon glyphicon-ok" data-state-icon="success"></span>
+                    <span class="glyphicon glyphicon-ban-circle" data-state-icon="fail"></span>-->
+                    <span ng-show="test.state == 'success' || test.state == 'running'"
+                          class="num-configurations">[tested configurations: {{test.numFinished}}]</span>
+                    <span ng-show="test.state == 'waiting' || test.state == 'running'"
+                          class="test-action glyphicon glyphicon-pause" id="test-pause-{{$index}}"
+                          data-pause="{{test.name}}" onclick="pauseTest($(this))"></span>
+                    <span ng-show="test.state == 'success'"
+                          class="test-action glyphicon glyphicon-trash" id="test-delete-{{$index}}"
+                          data-delete="{{test.name}}" onclick="deleteTest($(this))"></span>
+                </div>
+
+                <div class="test-information-wrapper">
+                    <div ng-show="test.state == 'success'" class="test-classifier-result-wrapper">
+                        <div ng-repeat="classifier in testList[$index]['results']" class="test-classifier-result">
+                            <div class="result-header" onclick="toggleResultInformation($(this))">
+                                <span>{{classifier.name}}</span>
+                                <span>[{{classifier.metric}}: {{classifier.metricValue}}]</span>
+                                <span>[runtime: {{classifier.runTime}}ms]</span>
+                            </div>
+                            <div class="result-body">
+                                <form class="classifier-result-actions" onchange="checkClsParameters($(this))"
+                                      oninput="checkClsParameters($(this))" data-create-id="{{classifier.id}}">
+                                    <label for="trained-{{classifier.id}}">trained?: </label>
+                                    <input id="trained-{{classifier.id}}" class="create-trained" type="checkbox">
+                                    <label for="given-name-{{classifier.id}}" class="hidden-label">Enter a
+                                        name for classifier</label>
+                                    <input type="text" id="given-name-{{classifier.id}}" placeholder="Name"
+                                           class="given-name name-input">
+                                    <button id="create-classifier-{{classifier.id}}"
+                                            class="create-classifier-from-result admin-button state-button"
+                                            onclick="createClassifierFromResult($(this))" data-state="disabled"
+                                            data-test-name="{{test.name}}">
+                                        Create Configuration
+                                        <span class="glyphicon glyphicon-alert" data-state-icon="disabled"></span>
+                                        <span class="glyphicon glyphicon-play" data-state-icon="enabled"></span>
+                                        <span class="glyphicon glyphicon-cog" data-state-icon="waiting"></span>
+                                        <span class="glyphicon glyphicon-ok" data-state-icon="success"></span>
+                                        <span class="glyphicon glyphicon-ban-circle" data-state-icon="fail"></span>
+                                    </button>
+                                </form>
+                                <label>Configuration:</label>
+                                <ul class="result-parameter-list">
+                                    <li ng-repeat="parameter in getInnerResult(test.name, classifier.id)">
+                                        {{parameter.text}}: {{parameter.value}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="test-classifier-ranges-wrapper">
+                            <label class="info-collapse-label" onclick="toggleElementList($(this))">
+                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                Configuration space</label>
+                            <div class="info-collapse-list">
+                                <div ng-repeat="classifier in testList[$index]['classifiers']">
+                                    <label>{{classifier.name}}</label>
+                                    <ul class="configuration-parameter-list">
+                                        <li ng-repeat="parameter in getInnerConfiguration(test.name, classifier.name)">
+                                            {{parameter.text}}: {{parameter.options}}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

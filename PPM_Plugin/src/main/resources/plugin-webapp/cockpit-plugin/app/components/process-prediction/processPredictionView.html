@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Process Prediction</title>
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/components/process-prediction/processPredictionStyle.css">
+    <link rel="stylesheet" type="text/css"
+          href="./../../../api/cockpit/plugin/cockpit-plugin/static/app/shared/styles/ppmAdminStyle.css">
+</head>
+
+<body>
+<div id="process-prediction" class="admin-container">
+    <div class="public-classifiers-wrapper">
+        <form id="public-classifiers" class="input-scrollable-radio">
+            <div ng-repeat="item in publicClassifiers">
+                <input type="radio" id="public-{{$index}}" value="{{item.name}}" name="public" ng-checked="item.def"
+                       onchange="loadPredictions()">
+                <label for="public-{{$index}}" class="list-label">{{item.name}} [v.{{item.version}}]<span
+                        ng-repeat="predictionTypeItem in publicClassifiers[$index].predictionTypeIcons"
+                        class="prediction-type-icon glyphicon {{predictionTypeItem}}"></span>
+                </label>
+            </div>
+        </form>
+    </div>
+
+    <div class="next-activity-wrapper" ng-show="!noClassifierWarning">
+        <h4>Next Activity <span class="tooltip-trigger glyphicon glyphicon-step-forward"
+                                onclick="$('#nextActivityInfo').modal()"></span>
+            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                  onclick="$('#nextActivityInfo').modal()"></span></h4>
+        <ol ng-if="activityPredictions != null">
+            <li ng-repeat="item in activityPredictions">
+                {{item.name}}: <span style="color: hsl({{item.probability}},80%,50%)">{{item.probability}}</span>%
+            </li>
+        </ol>
+        <p class="prediction-exception" ng-if="predictionException['ActivityPrediction']">This classifier does not
+            provide activity predictions.</p>
+    </div>
+
+    <div class="time-risk-wrapper" ng-show="!noClassifierWarning">
+
+        <h4>Remaining Time <span class="tooltip-trigger glyphicon glyphicon-hourglass"
+                                 onclick="$('#timePredictionInfo').modal()"></span>
+            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                  onclick="$('#timePredictionInfo').modal()"></span></h4>
+        <div id="time-prediction" ng-if="timePrediction != null">{{timePrediction}}</div>
+        <p class="prediction-exception" ng-if="predictionException['TimePrediction']">This classifier does not
+            provide time predictions.</p>
+        <h4>Risk prediction <span class="tooltip-trigger glyphicon glyphicon-flash"
+                                  onclick="$('#riskPredictionInfo').modal()"></span>
+            <span class="tooltip-trigger glyphicon glyphicon-info-sign"
+                  onclick="$('#riskPredictionInfo').modal()"></span></h4>
+        <div class="risk-wrapper">
+            <div class="chart-wrapper" ng-if="riskPrediction != null">
+                <svg viewBox="0 0 50 50" class="risk-chart">
+                    <path class="background-circle"
+                          stroke-dasharray="100, 100"
+                          d="M25 8
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path class="risk-circle"
+                          stroke-dasharray="{{riskPrediction}}, 100"
+                          style="stroke: hsl({{100 - riskPrediction}},80%,50%)"
+                          d="M25 8
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+            </div>
+            <div id="risk-prediction" ng-if="riskPrediction != null">{{riskPrediction}} %</div>
+            <p class="prediction-exception" ng-if="predictionException['RiskPrediction']">This classifier does not
+                provide risk predictions.</p>
+        </div>
+    </div>
+    <p ng-show="noClassifierWarning">To show predictions, please go to the list of deployments and create at least one
+        public classifier.</p>
+
+</div>
+
+<div class="modal fade sub-modal" id="nextActivityInfo" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Next activity</h4>
+            </div>
+            <div class="modal-body">
+                <p>Provides the probability distribution for the next task.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade sub-modal" id="timePredictionInfo" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Time prediction</h4>
+            </div>
+            <div class="modal-body">
+                <p>Provides a time prediction for the remaining time of the instance at the current activity.</p>
+                <p>Time is in format hours:minutes:seconds.milliseconds</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade sub-modal" id="riskPredictionInfo" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Risk prediction</h4>
+            </div>
+            <div class="modal-body">
+                <p>Provides the risk in percentage that the current instance will not reach an end activity (will
+                    fail).</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
